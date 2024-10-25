@@ -15,15 +15,15 @@ def get_file_type():
         if file.endswith(".xls"):
             parse_xls(file)
             continue
-            # pass
+            #pass
         if file.endswith(".pdf"):
             parse_pdf(file)
             continue
-            # pass
+            #pass
         if file.endswith(".docx"):
             parse_docx(file)
             continue
-            # pass
+            #pass
 
 def parse_xls(filename: str):
     new_filename = filename.replace(".xls", "")
