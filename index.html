@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выпадающий список с чекбоксами, поиском и диапазоном дат</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .dropdown_left{
+            position: absolute;
+            position: relative;
+            display: inline-block;
+            margin-right: 20px;
+        }
+        .dropdown_right{
+            position: absolute;
+            left: 1300px;
+            top: 20px;
+            width: 150px;
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 300px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            padding: 10px;
+        }
+
+        .dropdown-content label {
+            display: block;
+            padding: 8px 0;
+        }
+
+        .dropdown-content label:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown_left:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown_right:hover .dropdown-content {
+            display: block;
+            left: -265px;
+        }
+
+        .dropdown-button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-container {
+            padding: 8px;
+        }
+
+        .search-input {
+            position: absolute;
+            left: 200px;
+            top: 20px;
+            width: calc(100% - 550px);
+            padding: 8.5px;
+            margin-right: 10px;
+        }
+
+        .search-button {
+            position: absolute;
+            left: 1200px;
+            top: 21px;
+            padding: 8.5px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .date-range {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .date-range input {
+            padding: 8px;
+            margin-right: 10px;
+            width: 45%; /* Задаем ширину для полей ввода дат */
+        }
+
+        .text-input {
+            padding: 8px;
+            margin-top: 10px;
+            width: 90%; /* Задаем ширину для текстовых полей */
+        }
+    </style>
+</head>
+<body>
+
+<div class="dropdown_left">
+    <button class="dropdown-button">Выберите опции</button>
+    <div class="dropdown-content">
+        <label><input type="checkbox" value="option1"> Таблица "Интересы"</label>
+        <label><input type="checkbox" value="option2"> Таблица "Обращения"</label>
+        <label><input type="checkbox" value="option3"> Таблица "Объёмы перевозок"</label>
+    </div>
+</div>
+<div class="search-container">
+    <input type="text" class="search-input" placeholder="Поиск...">
+    <button class="search-button">Поиск</button>
+</div>
+<div class="dropdown_right">
+    <button class="dropdown-button">Выберите опции</button>
+    <div class="dropdown-content">
+        <div class="date-range">
+            <input type="date" placeholder="Начальная дата">
+            <input type="date" placeholder="Конечная дата">
+        </div>
+        <input type="text" class="text-input" placeholder="Город отправления">
+        <input type="text" class="text-input" placeholder="Город прибытия">
+    </div>
+</div>
+</body>
+</html>
