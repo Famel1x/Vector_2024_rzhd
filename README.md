@@ -1,3 +1,3 @@
-# Vector_2024_rzhd
-Kakyato hinya ilia a
+# ЦФРПР Окружной этап | Решение команды Vector
+
 
