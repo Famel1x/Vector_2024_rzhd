@@ -5,7 +5,6 @@ import time
 import csv
 
 from docx import Document
-from pdf2docx import Converter
 
 folder_path = 'РЖД train/Выгрузка_маркетинговые списки'
 
