@@ -21,7 +21,7 @@ button = ft.OutlinedButton(on_click = lambda e: click(e, inp, result),
                             content = ft.Column(controls=[ft.Text("Ввод", size = 24)]),
                             style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)))
 buttonToGoIE = ft.OutlinedButton(on_click = lambda e: e.page.go("/table"),
-                            content = ft.Column(controls=[ft.Text("Таблица", size = 24)]),
+                            content = ft.Column(controls=[ft.Text("Выгрузка", size = 24)]),
                             style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)))
 home_button = ft.ElevatedButton("Назад", on_click=lambda e: e.page.go("/"),
                     style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)))
@@ -52,15 +52,18 @@ async def process_file(file_path, table, page, import_btn, export_btn):
     table.rows.clear()
 
     for client_id in df["id"]:
-        response_text = agent2.research(client_id)
+        try:
+            response_text = agent2.research(client_id)
 
-        id_cell = ft.DataCell(ft.Text(str(client_id), size = 20))
-        percentage_cell = ft.DataCell(ft.Text(response_text["churn_probability"], size = 20))
-        comment_cell = ft.DataCell(ft.Text(response_text["justification"], size = 20))
+            id_cell = ft.DataCell(ft.Text(str(client_id), size = 20))
+            percentage_cell = ft.DataCell(ft.Text(response_text["churn_probability"], size = 20))
+            comment_cell = ft.DataCell(ft.Text(response_text["justification"], size = 20))
 
-        table.rows.append(ft.DataRow(cells=[id_cell, percentage_cell, comment_cell]))
-        table.rows.sort(key=lambda row: int(row.cells[1].content.value.strip('%')), reverse=True)
-        page.update()
+            table.rows.append(ft.DataRow(cells=[id_cell, percentage_cell, comment_cell]))
+            table.rows.sort(key=lambda row: int(row.cells[1].content.value.strip('%')), reverse=True)
+            page.update()
+        except:
+            pass
 
     import_btn.disabled = False
     export_btn.disabled = False
@@ -96,8 +99,8 @@ def main(page: ft.Page):
             ft.DataColumn(ft.Text("Комментарий", size = 24))
         ],
         rows=[],
-        data_row_min_height = 130,
-        data_row_max_height= 130,
+        data_row_min_height = 170,
+        data_row_max_height= 170,
         
     )
 
@@ -138,7 +141,7 @@ def main(page: ft.Page):
                         controls=[
                             result
                         ],
-                        height = page.window.height - 20,
+                        height = page.window.height,
                         auto_scroll=False
                     )
                 ],
