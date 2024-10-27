@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import re
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_community.chat_models.gigachat import GigaChat
 
@@ -59,22 +60,50 @@ class ML_AGEENT:
         
         _, personal_data = self.research_oblasts(id)
         _, personal_seasons = self.seasons(id)
-        _, personal_dop_info = self.research_directions(id)
+        _, personal_dop_info,sum = self.research_directions(id)
         persnal_problems = self.research_obrash(id)
         persnal_inters = self.research_interesting(id)
         
-        prompt = f"""У меня есть информация о клиенте железнодорожной компании, включая ключевое число:
+        prompt = f"""У нас есть информация о клиенте железнодорожной компании и ключевое значение для анализа:
 
-У нас есть число: {sum}. Если данное число равно '0', мы выставляем данному клиенту 100% вероятность ухода. В этом случае необходимо предоставить способы возвращения данного клиента.
-Данные клиента, связанные с размером его юридического лица, платежеспособностью и общими рисками данного бизнеса: {personal_data}.
-Данные о его грузоперевозках за последние два года: {personal_seasons}.
-Данные, которые связаны с общими способами взаимодействия компании с клиентом (обращения на консультирование, поддержку, жалобы, благодарности и т.д.): {persnal_inters}.
-Данные, содержащие записи об возникших проблемах клиента: {persnal_problems}.
-На основе предоставленных данных, пожалуйста, проанализируйте вероятность ухода клиента и предложите рекомендации для его возврата, если вероятность составляет больше 45%."""
+Значение {sum} - общая сумма платежей клиента компании за последние 9 месяцев. Важно отметить то, что:
+
+Если {sum} > 0, проанализируйте предоставленные данные и оцените вероятность ухода.
+Если {sum} == 0, вероятность ухода составляет 100%, и следует предоставить рекомендации для возврата клиента.
+
+Данные о клиенте:
+
+Информация о юридическом лице клиента, платежеспособности и рисках: {personal_data}
+Данные о грузоперевозках клиента за последние два года: {personal_seasons}
+Информация о взаимодействиях клиента с компанией, таких как обращения за консультированием, поддержка, жалобы, благодарности и т.д.: {persnal_inters}
+Данные о проблемах клиента, возникших ранее: {persnal_problems}
+Пожалуйста, на основе этих данных, если {sum} > 0, оцените вероятность ухода клиента и предоставьте рекомендации для удержания клиента, если вероятность ухода составляет более 45%. Если {sum} == 0, предложите действия для возвращения клиента с высокой вероятностью ухода (100%)
+
+Сами же данные нужно представить в виде: 
+
+Вероятность ухода: <оценка вероятности ухода в процентах>
+Обоснование: <основной текст>"""
         messages.append(HumanMessage(content=prompt))
         res = chat(messages)
         messages.append(res)
-        return res.content
+        
+        pattern = r"Вероятность ухода:\s*(\d+%)\nОбоснование:\s*(.*)"
+        
+        match = re.search(pattern, res.content, re.DOTALL)
+
+        if match:
+            # Извлечение данных из групп регулярного выражения
+            churn_probability = match.group(1)  # Вероятность ухода
+            justification = match.group(2)  # Обоснование
+            
+            # Формируем структурированный ответ
+            structured_data = {
+                "churn_probability": churn_probability,
+                "justification": justification
+            }
+            
+            return structured_data
+        
         ...
     
     def research_oblasts(self, id:str) -> str:
@@ -121,6 +150,7 @@ class ML_AGEENT:
         all_data = filtred.values.T.tolist()
         
         text=""
+        sum=0
         
         for i in range(len(all_data[3])):
 
@@ -128,7 +158,17 @@ class ML_AGEENT:
             
         # print (text)
         
-        return all_data, text
+        years = filtred.columns.values.tolist()[5:]
+        month = filtred[years].values.T.tolist()
+        
+        
+        for i in month[-8::2]:
+            
+            for j in i:
+                
+                sum+=j
+        
+        return all_data, text,sum
 
     def research_interesting(self, id:str) -> str:
         filtred = self.dataframe_interesting[self.dataframe_interesting["ID"] == id][["Состояние", "Канал первичного интереса"]]

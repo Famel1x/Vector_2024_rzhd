@@ -1,9 +1,8 @@
 import flet as ft
 import flet_utils
 import pandas as pd
-import time
+import datetime
 import asyncio
-import random
 
 agent = flet_utils.ML_AGEENT()
 
@@ -36,21 +35,6 @@ def click(e, inp, text):
     buttonToGoIE.disabled = False
     e.page.update()
 
-# Функция для имитации запроса на сервер
-def fetch_data(client_id):
-    # Эмуляция текста ответа от сервера (JSON-строка или текстовый формат)
-    response_text = f'{{"id": {client_id}, "percentage": {random.randint(0, 100)}, "comment": "Комментарий для клиента {client_id}"}}'
-    return response_text
-
-# Функция для обработки ответа и извлечения данных
-def parse_response(response_text):
-    # Пример парсинга данных из текстового ответа
-    data = eval(response_text)  # Используем eval для преобразования строки в словарь
-    client_id = data["id"]
-    percentage = data["percentage"]
-    comment = data["comment"]
-    return client_id, percentage, comment
-
 async def process_file(file_path, table, page, import_btn, export_btn):
     df = pd.read_excel(file_path)
 
@@ -67,13 +51,11 @@ async def process_file(file_path, table, page, import_btn, export_btn):
     table.rows.clear()
 
     for client_id in df["id"]:
-        response_text = fetch_data(client_id)
+        response_text = agent.research(client_id)
 
-        id_value, percentage, comment = parse_response(response_text)
-
-        id_cell = ft.DataCell(ft.Text(str(id_value), size = 20))
-        percentage_cell = ft.DataCell(ft.Text(f"{percentage}%", size = 20))
-        comment_cell = ft.DataCell(ft.Text(comment, size = 20))
+        id_cell = ft.DataCell(ft.Text(str(client_id), size = 20))
+        percentage_cell = ft.DataCell(ft.Text(response_text["churn_probability"], size = 20))
+        comment_cell = ft.DataCell(ft.Text(response_text["justification"], size = 20))
 
         table.rows.append(ft.DataRow(cells=[id_cell, percentage_cell, comment_cell]))
         table.rows.sort(key=lambda row: int(row.cells[1].content.value.strip('%')), reverse=True)
@@ -85,7 +67,7 @@ async def process_file(file_path, table, page, import_btn, export_btn):
     pg.visible = False
     page.update()
 
-def export_to_excel(table):
+def export_to_excel(page, table):
     data = {
         "Id": [row.cells[0].content.value for row in table.rows],
         "Процент": [row.cells[1].content.value for row in table.rows],
@@ -94,10 +76,14 @@ def export_to_excel(table):
 
     df = pd.DataFrame(data)
 
-    time_string = time.current_time.strftime("%d-%m-%Y %H:%M:%S")
+    now = datetime.datetime.now()
+    time_string = now.strftime("%d_%m_%Y_%H_%M_%S")
+
     export_path = f"table_data_{time_string}.xlsx"
     df.to_excel(export_path, index=False)
-    print(f"Данные успешно сохранены в {export_path}")
+
+    page.snack_bar = ft.SnackBar(ft.Text(f"Данные успешно сохранены в {export_path}"), open=True)
+    page.update()
 
 def main(page: ft.Page):
     page.title = "Flet app"
@@ -109,9 +95,11 @@ def main(page: ft.Page):
             ft.DataColumn(ft.Text("Комментарий", size = 24))
         ],
         rows=[],
+        data_row_min_height = 130,
+        data_row_max_height= 130,
+        
     )
 
-        # Обработчик загрузки файла
     def process_upload(event):
         if event.files:
             file_path = event.files[0].path
@@ -126,9 +114,9 @@ def main(page: ft.Page):
 
     page.overlay.append(file_picker)
 
-    load_button = ft.ElevatedButton("Загрузить Excel-файл", on_click=lambda e: file_picker.pick_files(),
+    load_button = ft.ElevatedButton("Загрузить", on_click=lambda e: file_picker.pick_files(),
                                     style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)))
-    export_button = ft.ElevatedButton("Выгрузить файл", on_click=lambda e: export_to_excel(table), disabled = True,
+    export_button = ft.ElevatedButton("Выгрузить файл", on_click=lambda e: export_to_excel(page, table), disabled = True,
                                       style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)))
 
 
@@ -171,7 +159,7 @@ def main(page: ft.Page):
                             controls=[
                                 table
                             ],
-                            height = page.window.height,
+                            height = page.window.height - 25,
                             auto_scroll=False
                         )
                     ],
