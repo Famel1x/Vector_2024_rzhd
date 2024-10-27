@@ -5,6 +5,7 @@ import datetime
 import asyncio
 
 agent = flet_utils.ML_AGEENT()
+agent2 = flet_utils.ML_AGEENT2()
 
 ch_title = ["Интересы", "Обращения", "Объемы перевозок"]
 checkbox_list = [ft.Checkbox(f"Таблица {lb}") for lb in ch_title]
@@ -51,7 +52,7 @@ async def process_file(file_path, table, page, import_btn, export_btn):
     table.rows.clear()
 
     for client_id in df["id"]:
-        response_text = agent.research(client_id)
+        response_text = agent2.research(client_id)
 
         id_cell = ft.DataCell(ft.Text(str(client_id), size = 20))
         percentage_cell = ft.DataCell(ft.Text(response_text["churn_probability"], size = 20))
