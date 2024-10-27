@@ -1,0 +1,8 @@
+Python 3
+Flask[async]
+g4f 
+aiohttp
+aiohttp_socks
+auth
+Werkzeug
+requests
