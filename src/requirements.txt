@@ -7,3 +7,4 @@ g4f
 Werkzeug>=3.0.3
 aiohttp_socks
 nodriver
+pysqlite3
