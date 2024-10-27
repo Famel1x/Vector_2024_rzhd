@@ -1,4 +1,6 @@
 Решение.
 
-pip install -r requirements.txt \n
+pip install -r requirements.txt 
+
+
 Запустить start.bat
