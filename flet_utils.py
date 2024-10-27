@@ -340,7 +340,7 @@ class ML_AGEENT2:
         for i in range(len(month_normal)):
             text += f"Клиент в год, месяц - {month_normal[i]} перевёз {month_in_tons[i]} тон груза  на сумму: {month_in_money[i]}\n"
             
-        # print(text)
+        print(text)
         
         return filtred, text
 
